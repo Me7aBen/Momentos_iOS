@@ -15,7 +15,7 @@ import SwiftData
         let modelContainer: ModelContainer
         
         // 'badgeManager' lo añadiremos en la próxima sesión.
-        // var badgeManager: BadgeManager
+         var badgeManager: BadgeManager
 
         var context: ModelContext {
             modelContainer.mainContext
@@ -26,7 +26,7 @@ import SwiftData
             // Por ahora, solo guardará objetos 'Moment'.
             let schema = Schema([
                 Moment.self,
-                //Badge.self // Añadimos Badge aquí para prepararnos para la Sesión 3
+                Badge.self // Añadimos Badge aquí para prepararnos para la Sesión 3
             ])
 
             // 2. Configura cómo se guardarán los datos.
@@ -39,8 +39,8 @@ import SwiftData
                 // 3. Intenta crear el contenedor.
                 modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
                 
-                // badgeManager = BadgeManager(modelContainer: modelContainer)
-                // try badgeManager.loadBadgesIfNeeded()
+                badgeManager = BadgeManager(modelContainer: modelContainer)
+                try badgeManager.loadBadgesIfNeeded() // Carga los logros al iniciar
 
                 // 4. Si 'includeSampleMoments' es verdadero, carga los datos de muestra.
                 if includeSampleMoments {
@@ -56,7 +56,7 @@ import SwiftData
         private func loadSampleMoments() throws {
             for moment in Moment.sampleData {
                 context.insert(moment)
-                // try badgeManager.unlockBadges(newMoment: moment)
+                 try badgeManager.unlockBadges(newMoment: moment)
             }
         }
     }
