@@ -48,11 +48,11 @@ import SwiftUI
             // 3. Definimos el tamaño final del control
             .frame(width: layout.size, height: layout.size)
             // 4. (En la próxima sesión, aquí pondremos la insignia)
-            // .overlay(alignment: .topTrailing) {
-            //     if let moment {
-            //         HexagonAccessoryView(moment: moment, hexagonLayout: layout)
-            //     }
-            // }
+             .overlay(alignment: .topTrailing) {
+                 if let moment {
+                     HexagonAccessoryView(moment: moment, hexagonLayout: layout)
+                 }
+             }
         }
     }
 
