@@ -77,7 +77,7 @@ import SwiftUI
             
             do {
                 // (En la próxima sesión, aquí llamaremos a 'unlockBadges')
-                // try dataContainer.badgeManager.unlockBadges(newMoment: newMoment)
+                 try dataContainer.badgeManager.unlockBadges(newMoment: newMoment)
                 
                 // 3. Intenta guardar el contexto en la base de datos
                 try dataContainer.context.save()

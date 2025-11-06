@@ -11,7 +11,7 @@ import SwiftData
 @main
 struct MomentosApp: App {
     
-    // Crea una instancia de nuestro DataContainer.
+            // Crea una instancia de nuestro DataContainer.
             // 'includeSampleMoments' es falso por defecto,
             // así que esto creará una base de datos real en el dispositivo.
             let dataContainer = DataContainer()
