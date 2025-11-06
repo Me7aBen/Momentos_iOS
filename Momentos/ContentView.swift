@@ -9,16 +9,24 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        // TabView es el componente que crea la barra de pestañas inferior
+        TabView {
+            // --- Pestaña 1 ---
+            MomentsView()
+                .tabItem {
+                    Label("Momentos", image: "MomentsTab") // Icono personalizado
+                }
+            
+            // --- Pestaña 2 ---
+            AchievementsView()
+                .tabItem {
+                    Label("Logros", systemImage: "medal.fill") // Icono del sistema
+                }
         }
-        .padding()
     }
 }
 
 #Preview {
     ContentView()
+        .sampleDataContainer()
 }
