@@ -4,45 +4,61 @@
 //
 //  Created by Brian Benjamin Pareja Meruvia on 5/11/25.
 //
-
 import Foundation
 
-    struct StreakCalculator {
-        let calendar = Calendar.current
+struct StreakCalculator {
+    let calendar = Calendar.current
 
-        /// Cuenta el número de días seguidos que se ha guardado un momento.
-        /// - precondition: `moments` debe estar ordenado por timestamp, del más antiguo al más nuevo.
-        func calculateStreak(for moments: [Moment]) -> Int {
-            let startOfToday = calendar.startOfDay(for: .now)
-            // Obtenemos el final del día de hoy (ej. hoy a las 23:59:59)
-            let endOfToday = calendar.date(byAdding: DateComponents(day: 1, second: -1), to: startOfToday)!
-
-            // 1. Damos vuelta al array (de más nuevo a más antiguo)
-            // 2. Obtenemos solo los timestamps
-            // 3. Calculamos cuántos días "atrás" (0 = hoy, 1 = ayer) fue cada momento
-            // 4. Filtramos los nil (compactMap)
-            // Ej. resultado: [0, 0, 1, 2, 4, 5] (hubo 2 hoy, 1 ayer, 1 anteayer, 1 hace 4 días...)
-            let daysAgoArray = moments
-                .reversed()
-                .map(\.timestamp)
-                .map { calendar.dateComponents([.day], from: $0, to: endOfToday) }
-                .compactMap { $0.day }
-
-            var streak = 0
-            
-            // Si el último momento no fue hoy (0) o ayer (1), la racha es 0.
-            if let lastDay = daysAgoArray.first, lastDay > 1 {
-                return 0
+    func calculateStreak(for moments: [Moment]) -> Int {
+        // Ordena los momentos del más nuevo al más antiguo
+        let sortedMoments = moments.sorted(by: { $0.timestamp > $1.timestamp })
+        
+        // Mapea los momentos a los días en que ocurrieron (ignorando la hora)
+        let dates = sortedMoments.map { calendar.startOfDay(for: $0.timestamp) }
+        
+        // Elimina duplicados (si se registraron 2 momentos el mismo día)
+        let uniqueDates = dates.reduce(into: [Date]()) { result, date in
+            if result.last != date {
+                result.append(date)
             }
+        }
+        
+        if uniqueDates.isEmpty {
+            return 0
+        }
+        
+        var streak = 0
+        let today = calendar.startOfDay(for: .now)
+        
+        // Revisa si la última entrada fue hoy o ayer
+        if uniqueDates.first == today {
+            streak = 1
+        } else if uniqueDates.first == calendar.date(byAdding: .day, value: -1, to: today) {
+            streak = 1 // Si fue ayer, la racha "sigue viva" y contamos desde ayer
+        } else {
+            return 0 // Si fue antes de ayer, la racha se rompió
+        }
 
-            // Un Set nos da los días únicos (ej. [0, 1, 2, 4, 5])
-            let uniqueDays = Set(daysAgoArray)
-
-            // Contamos desde hoy (0) hacia atrás
-            while uniqueDays.contains(streak) {
-                streak += 1
-            }
-
+        // Si hay más de una fecha única, contamos hacia atrás
+        guard uniqueDates.count > 1 else {
             return streak
         }
+
+        // Comparamos cada día con el día anterior
+        for (index, date) in uniqueDates.enumerated() {
+            // Saltamos el primer día (ya lo contamos)
+            if index == 0 { continue }
+            
+            let previousDate = uniqueDates[index - 1]
+            let expectedDate = calendar.date(byAdding: .day, value: -1, to: previousDate)
+            
+            if date == expectedDate {
+                streak += 1 // El día es consecutivo, suma la racha
+            } else {
+                break // El día no es consecutivo, rompe el bucle
+            }
+        }
+        
+        return streak
     }
+}

@@ -48,8 +48,18 @@ import SwiftUI
                         .font(.subheadline)
                     Spacer()
                     // (Aquí irán las insignias en la próxima sesión)
-                    // ForEach(moment.badges) { ... }
-                }
+                    ForEach(moment.badges) { badge in
+                                        NavigationLink {
+                                            // Destino: La vista de detalle del logro
+                                            BadgeDetailView(badge: badge)
+                                        } label: {
+                                            // Etiqueta: La imagen del logro
+                                            Image(badge.details.image)
+                                                .resizable()
+                                                .frame(width: 44, height: 44)
+                                        }
+                                    }
+                                }
                 if !moment.note.isEmpty {
                     Text(moment.note) // Muestra la nota
                         .textSelection(.enabled) // Permite copiar el texto

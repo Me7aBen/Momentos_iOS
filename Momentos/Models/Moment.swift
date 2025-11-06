@@ -19,8 +19,8 @@ import Foundation
         
         // Relación: Un momento puede desbloquear varias insignias.
         // Lo usaremos en la próxima sesión.
-        //@Relationship(inverse: \Badge.moment)
-        //var badges: [Badge] = []
+        @Relationship(inverse: \Badge.moment)
+        var badges: [Badge] = []
 
         init(title: String, note: String, imageData: Data? = nil, timestamp: Date = .now) {
             self.title = title
