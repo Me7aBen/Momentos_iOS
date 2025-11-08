@@ -35,5 +35,5 @@ import SwiftUI
     }
 
     #Preview {
-        StreakView(numberOfDays: 23)
+        StreakView(numberOfDays: 10)
     }
