@@ -1,73 +1,70 @@
-//
-//  Moment.swift
-//  Momentos
-//
-//  Created by Brian Benjamin Pareja Meruvia on 5/11/25.
-//
+// Momentos/Models/Moment.swift
+
 import Foundation
-    import SwiftData
-    import UIKit
+import SwiftData
+import UIKit
 
-    // @Model es la macro mágica de SwiftData.
-    // Automáticamente hace que esta clase sea almacenable en la base de datos.
-    @Model
-    class Moment {
-        var title: String
-        var note: String
-        var imageData: Data? // Guardamos la imagen como Data (binario)
-        var timestamp: Date
-        
-        // Relación: Un momento puede desbloquear varias insignias.
-        // Lo usaremos en la próxima sesión.
-        @Relationship(inverse: \Badge.moment)
-        var badges: [Badge] = []
+@Model
+class Moment {
+    var title: String
+    var note: String
+    var imageData: Data?
+    var timestamp: Date
+    var category: MomentCategory // <-- AÑADIDO
 
-        init(title: String, note: String, imageData: Data? = nil, timestamp: Date = .now) {
-            self.title = title
-            self.note = note
-            self.imageData = imageData
-            self.timestamp = timestamp
-        }
+    @Relationship(inverse: \Badge.moment)
+    var badges: [Badge] = []
 
-        // Una 'propiedad computada' conveniente para convertir los Data
-        // en un objeto UIImage que la app pueda mostrar.
-        var image: UIImage? {
-            imageData.flatMap {
-                UIImage(data: $0)
-            }
-        }
+    // Actualiza el 'init'
+    init(title: String, note: String, imageData: Data? = nil, timestamp: Date = .now, category: MomentCategory = .otro) {
+        self.title = title
+        self.note = note
+        self.imageData = imageData
+        self.timestamp = timestamp
+        self.category = category // <-- AÑADIDO
     }
 
-    // Extensión para proveer datos de muestra para nuestras Vistas Previas (Previews)
-    extension Moment {
-        static let sample = sampleData[0]
-        static let longTextSample = sampleData[1]
-        static let imageSample = sampleData[4]
-
-        // --- DATOS DE MUESTRA TRADUCIDOS ---
-        static let sampleData = [
-            Moment(
-                title: "🍅🥳",
-                note: "¡Recolecté mi primer tomate de la huerta!"
-            ),
-            Moment(
-                title: "¡Aprobé el examen!",
-                note: "El examen de química estuvo difícil, pero creo que me fue bien 🙌. Qué bueno que contacté a Guillermo y Lee para estudiar. ¡Realmente ayudó!",
-                imageData: UIImage(named: "Study")?.pngData()
-            ),
-            Moment(
-                title: "Tiempo de descanso",
-                note: "Muy agradecido por una tarde relajante después de una semana ocupada.",
-                imageData: UIImage(named: "Relax")?.pngData()
-            ),
-            Moment(
-                title: "Familia ❤️",
-                note: ""
-            ),
-            Moment(
-                title: "¡Genial!",
-                note: "Fui a un gran concierto con Blair 🎶",
-                imageData: UIImage(named: "Concert")?.pngData()
-            )
-        ]
+    var image: UIImage? {
+        imageData.flatMap {
+            UIImage(data: $0)
+        }
     }
+}
+
+extension Moment {
+    static let sample = sampleData[0]
+    static let longTextSample = sampleData[1]
+    static let imageSample = sampleData[4]
+
+    // Actualiza los datos de muestra
+    static let sampleData = [
+        Moment(
+            title: "🍅🥳",
+            note: "¡Recolecté mi primer tomate de la huerta!",
+            category: .naturaleza // <-- AÑADIDO
+        ),
+        Moment(
+            title: "¡Aprobé el examen!",
+            note: "El examen de química estuvo difícil, pero creo que me fue bien 🙌. Qué bueno que contacté a Guillermo y Lee para estudiar. ¡Realmente ayudó!",
+            imageData: UIImage(named: "Study")?.pngData(),
+            category: .estudio // <-- AÑADIDO
+        ),
+        Moment(
+            title: "Tiempo de descanso",
+            note: "Muy agradecido por una tarde relajante después de una semana ocupada.",
+            imageData: UIImage(named: "Relax")?.pngData(),
+            category: .salud // <-- AÑADIDO
+        ),
+        Moment(
+            title: "Familia ❤️",
+            note: "",
+            category: .familia // <-- AÑADIDO
+        ),
+        Moment(
+            title: "¡Genial!",
+            note: "Fui a un gran concierto con Blair 🎶",
+            imageData: UIImage(named: "Concert")?.pngData(),
+            category: .amigos // <-- AÑADIDO
+        )
+    ]
+}

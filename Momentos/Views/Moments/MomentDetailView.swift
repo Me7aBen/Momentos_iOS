@@ -1,84 +1,91 @@
-//
-//  MomentDetailView.swift
-//  Momentos
-//
-//  Created by Brian Benjamin Pareja Meruvia on 5/11/25.
-//
+// Momentos/Views/Moments/MomentDetailView.swift
 
 import SwiftUI
-    import SwiftData
+import SwiftData
 
-    struct MomentDetailView: View {
-        var moment: Moment // Recibe el momento que debe mostrar
-        @State private var showConfirmation = false
+struct MomentDetailView: View {
+    var moment: Moment
+    @State private var showConfirmation = false
 
-        @Environment(\.dismiss) private var dismiss
-        @Environment(DataContainer.self) private var dataContainer
+    @Environment(\.dismiss) private var dismiss
+    @Environment(DataContainer.self) private var dataContainer
 
-        var body: some View {
-            ScrollView {
-                contentStack
+    var body: some View {
+        ScrollView {
+            contentStack
+        }
+        .navigationTitle(moment.title)
+        .toolbar {
+            ToolbarItem(placement: .destructiveAction) {
+                Button {
+                    showConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .confirmationDialog("Eliminar Momento", isPresented: $showConfirmation) {
+                    Button("Eliminar Momento", role: .destructive) {
+                        dataContainer.context.delete(moment)
+                        try? dataContainer.context.save()
+                        dismiss()
+                    }
+                } message: {
+                    Text("El momento será eliminado permanentemente.")
+                }
             }
-            .navigationTitle(moment.title) // Título dinámico
-            .toolbar {
-                ToolbarItem(placement: .destructiveAction) {
-                    Button {
-                        showConfirmation = true
+        }
+    }
+
+    // --- PÍLDORA DE CATEGORÍA ---
+    private var categoryPill: some View {
+        Label(moment.category.title, systemImage: moment.category.systemImage)
+            .font(.caption.bold())
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .foregroundStyle(.white) // Texto blanco
+            .background(moment.category.color.gradient) // Fondo con color
+            .clipShape(Capsule()) // Forma de píldora
+    }
+    // --- FIN DE LA PÍLDORA ---
+
+    private var contentStack: some View {
+        VStack(alignment: .leading, spacing: 16) { // Añadido espaciado
+            HStack {
+                Text(moment.timestamp, style: .date)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary) // Tono más suave
+                Spacer()
+                ForEach(moment.badges) { badge in
+                    NavigationLink {
+                        BadgeDetailView(badge: badge)
                     } label: {
-                        Image(systemName: "trash") // Botón de eliminar
-                    }
-                    .confirmationDialog("Eliminar Momento", isPresented: $showConfirmation) {
-                        Button("Eliminar Momento", role: .destructive) {
-                            // Lógica de eliminación
-                            dataContainer.context.delete(moment)
-                            try? dataContainer.context.save()
-                            dismiss() // Cierra la vista de detalle
-                        }
-                    } message: {
-                        Text("El momento será eliminado permanentemente.")
+                        Image(badge.details.image)
+                            .resizable()
+                            .frame(width: 44, height: 44)
                     }
                 }
             }
-        }
-
-        private var contentStack: some View {
-            VStack(alignment: .leading) {
-                HStack {
-                    Text(moment.timestamp, style: .date) // Muestra la fecha
-                        .font(.subheadline)
-                    Spacer()
-                    // (Aquí irán las insignias en la próxima sesión)
-                    ForEach(moment.badges) { badge in
-                                        NavigationLink {
-                                            // Destino: La vista de detalle del logro
-                                            BadgeDetailView(badge: badge)
-                                        } label: {
-                                            // Etiqueta: La imagen del logro
-                                            Image(badge.details.image)
-                                                .resizable()
-                                                .frame(width: 44, height: 44)
-                                        }
-                                    }
-                                }
-                if !moment.note.isEmpty {
-                    Text(moment.note) // Muestra la nota
-                        .textSelection(.enabled) // Permite copiar el texto
-                }
-                if let image = moment.image {
-                    Image(uiImage: image) // Muestra la imagen
-                        .resizable()
-                        .scaledToFit()
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                }
+            
+            categoryPill // <-- AÑADIMOS LA PÍLDORA AQUÍ
+            
+            if !moment.note.isEmpty {
+                Text(moment.note)
+                    .textSelection(.enabled)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
+            if let image = moment.image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
     }
+}
 
-    #Preview {
-        NavigationStack {
-            MomentDetailView(moment: .imageSample)
-                .sampleDataContainer()
-        }
+#Preview {
+    NavigationStack {
+        MomentDetailView(moment: .imageSample)
+            .sampleDataContainer()
     }
+}
